@@ -1,0 +1,7 @@
+.board{
+    width: 500px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    background: lightblue;
+    height: 500px;
+    }

@@ -1,0 +1,25 @@
+.tile-container{
+    background: #343434;
+   
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* padding-block: 2rem; */
+}
+
+.tile{
+    width: 80%;
+    height: 80%;
+    text-align: center;
+    color: white;
+}
+.hovered{
+    box-shadow: inset 0px 0px 10px white;
+}
+.tile-lit{
+    background: lightpink;
+}
+.tile-dark{
+    background: darkmagenta;
+}
