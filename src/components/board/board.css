@@ -2,6 +2,26 @@
     width: 500px;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    background: lightblue;
+    /* background: lightblue; */
     height: 500px;
-    }
+    position: absolute
+}
+
+.board-overlay{
+    opacity: 32%;
+    background: white;
+    text-align: center;
+
+
+}
+.good-job, .play-again {
+    font-family: 'Orbitron', sans-serif;
+    grid-column: span 5;
+
+}
+.good-job{
+    font-size: 5.7em;
+    grid-column: span 5;
+
+}
+

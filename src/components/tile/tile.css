@@ -12,14 +12,23 @@
     width: 80%;
     height: 80%;
     text-align: center;
-    color: white;
+    color: #ffffff;
+    border-radius: 3%;
+
 }
-.hovered{
-    box-shadow: inset 0px 0px 10px white;
-}
+
 .tile-lit{
-    background: lightpink;
+    background: #ff5bad;
+    border: 1px solid #ff5bad;
+    box-shadow:  0px 0px 9px white;
+
 }
 .tile-dark{
-    background: darkmagenta;
+    background: #682168;
+    border: 1px solid #682168;
+
+}
+.hovered{
+    box-shadow: inset 0px 0px 1px white;
+    border: 1px solid rgb(251, 251, 150);
 }

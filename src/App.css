@@ -1,4 +1,69 @@
 .page{
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* grid-template-columns: repeat(3, 1fr); */
+    grid-template-columns: 1.5fr 4fr;
 }
+.col-1{
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+    text-align: center;
+    background-color: rgb(53, 53, 53);
+    padding-top: 3vh;
+    display: grid;
+}
+.col-2{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(19, 21, 21);
+    height: 100vh;
+    position: relative;
+}
+.site-title{
+    color: white;
+    width: 100%;
+    font-family: 'Orbitron', sans-serif;
+}
+.site-title-light{
+    color: white;
+}
+.site-title-out{
+    color: pink;
+}
+.start-button{
+    font-family: 'Orbitron', sans-serif; 
+    font-style: bold;
+    padding: 6px;
+    padding-left: 40px;
+    padding-right: 40px;
+    border-radius: 14px;
+    color: black;
+    background: pink;
+}
+.start-button:hover{
+    background: white
+}
+
+.score{
+    font-size: 45px;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+}
+.col-1-row-2{
+    /* padding: 100px; */
+}
+.instructions{
+    font-family: 'Orbitron', sans-serif;
+    font-style: bold;
+    color: white;
+    text-align: left;
+    padding: 23px;
+    font-size: 1em;
+}
+.pink{
+    color: pink;
+}
+/* 
+font-family: 'Montserrat', sans-serif;
+font-family: 'Orbitron', sans-serif; */
