@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 
 import { Component, useEffect } from 'react';
 import Board from './components/board/board.js';
@@ -6,6 +5,8 @@ import Board from './components/board/board.js';
 import { Button } from '@atomic-reactor/reactium-ui/Button';
 
 import './App.css';
+import { DirectionLtr, ThreeDGlasses } from '@atomic-reactor/reactium-ui/Icon/Linear';
+import { toBeInvalid } from '@testing-library/jest-dom/dist/matchers';
 
 
 class App extends Component{
@@ -14,8 +15,10 @@ class App extends Component{
     tiles: new Array(25),
     plays: 0, 
     highlightedTile: null, 
-    showOverlay: false, 
-    showWinMessage: false
+    showWinOverlay: false, 
+    showPreGameOverlay: true,
+    demoMode: true, 
+    gameInPLay: false, 
   }
 
 
@@ -23,8 +26,11 @@ class App extends Component{
     
     const tilesToFlip = this.calculateAdjacentTiles(index);
     this.flipAdjacentTiles(tilesToFlip);
-    this.setState({plays: this.state.plays + 1 })
+    if(!this.state.demoMode){
+      this.setState({plays: this.state.plays + 1 })      
+    }
   }
+
   calculateAdjacentTiles(index){
       const isRightEdge =  (index +1) % 5 === 0;
       const isLeftEdge = index % 5 === 0;
@@ -68,11 +74,24 @@ class App extends Component{
     const allLightsOut = newTiles.every(tile => tile === false);
     if (allLightsOut){
       this.setState({
-        showOverlay:true, 
-        showWinMessage: true, 
-        highlightedTile: null
-      })
+        showWinOverlay:true, 
+        highlightedTile: null, 
+        gameInPLay: false, 
+        demoMode: true
+      });
+      this.startCelebrationSequence();
     }
+  }
+  startCelebrationSequence=()=>{
+    const allFalse = this.state.tiles.map(tile=>false);
+    const allTrue = this.state.tiles.map(tile=>true);
+    setTimeout(()=>{this.setState({tiles: allTrue})}, 500)
+    setTimeout(()=>{this.setState({tiles: allFalse})}, 1000)
+    setTimeout(()=>{this.setState({tiles: allTrue})}, 1500)
+    setTimeout(()=>{this.setState({tiles: allFalse})}, 2000)
+    setTimeout(()=>{this.setState({tiles: allTrue})}, 2500)
+    setTimeout(()=>{this.setState({tiles: allFalse})}, 3000)
+
   }
 
 
@@ -85,14 +104,14 @@ class App extends Component{
       } while (i < 25);
       this.setState({tiles: myArray});
     document.addEventListener('keydown', this.navigateWithKeyboard);
-    // this.createChaos();
+    setTimeout(this.startDemoMode, 500)
     }
 
   
-  createChaos(){
-    //theoretically, there are unbeatable boards. Generated actual plays from a blnak board is an attempt to avoid that
+  createChaos=()=>{
+    //theoretically, there are unbeatable boards. Generated actual plays from a blank board is an attempt to avoid that
     let preplays = [];
-    const totalPreplays = Math.floor(Math.random() * 30) + 10;
+    const totalPreplays = Math.floor(Math.random() * 10) +2;
     for(let i = 0; i <totalPreplays ; i++){
       const val = Math.floor(Math.random() * 25);
       preplays.push(val);
@@ -105,15 +124,22 @@ class App extends Component{
         newTiles[index] = !newTiles[index];
       })
     });
-    this.setState({ tiles: newTiles});
+    this.setState({ tiles: newTiles, highlightedTile: null});
   }
-  onStartClicked = ()=>{  
-    this.createChaos();
+  startGame = ()=>{  
+
+
+    
     this.setState({
-      showOverlay: false,
-      showWinMessage: false,
-      plays: 0
+      showWinOverlay: false,
+      showPreGameOverlay: false,
+      plays: 0, 
+      gameInPLay: true,
+      demoMode: false, 
+      tiles: this.state.tiles.map(tile=>false)
     })
+    setTimeout(this.createChaos, 600)
+
   }
   navigateWithKeyboard=(e)=>{
   
@@ -144,9 +170,35 @@ class App extends Component{
   }
   
   handleHover=(index)=>{
-    console.log(index)
     this.setState({ highlightedTile: index})
   }
+
+
+  calculateComputerMove=()=>{
+    const directionMath = [-5, 5, -1, 1];
+    let directionIndex = 0;
+    let nextIndex = 0;
+    do{
+      directionIndex  = Math.floor(Math.random() * 4 );
+      nextIndex = this.state.highlightedTile + directionMath[directionIndex];
+    }
+    while( nextIndex > 24 || nextIndex < 0 );
+    this.setState({highlightedTile: nextIndex});
+
+    if(this.state.tiles[nextIndex]){
+      this.handleTileClick(nextIndex);
+    }
+    if(this.state.demoMode)
+    setTimeout(this.calculateComputerMove, 1000)
+  }
+
+  startDemoMode=()=>{
+    this.createChaos();
+    setTimeout(this.calculateComputerMove, 500)
+  }
+
+ 
+
   render(){
     return (
       <div className="page"
@@ -163,10 +215,12 @@ class App extends Component{
             <p>Turn off all the lights with as few moves as possible!</p>
           </div> 
         <div>
+          
           <button 
               className="start-button"
-              onClick={this.onStartClicked}>START
+              onClick={this.startGame}>NEW GAME
           </button>
+          
         </div>
           
         </div>
@@ -176,8 +230,8 @@ class App extends Component{
         </div>
       
         <Board
-          showWinMessage={this.state.showWinMessage}
-          showOverlay={this.state.showOverlay}
+          showPreGameOverlay={this.state.showPreGameOverlay}
+          showWinOverlay={this.state.showWinOverlay}
           highlightedTile={this.state.highlightedTile}
           handleHover={this.handleHover}
           handleTileClick={this.handleTileClick}

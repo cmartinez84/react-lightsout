@@ -1,9 +1,26 @@
 import './board.css';
 import Tile from '../tile/tile';
-import BoardOverlay from './boardOverlay';
+
+
+const BoardOverlay = function(){
+    return(
+        <div className="board board-overlay">
+            <p className="good-job">Good Job!</p>
+            <p className="play-again">Click NEW GAME to play again</p>
+        </div>
+
+    )
+}
+
+const PreGameOverLay = function(){
+    return(
+        <div className="board board-overlay">
+            
+        </div>
+    )
+}
 
 const Board = function(props){
-   
 
     return (
         <div className="col-2">
@@ -21,17 +38,17 @@ const Board = function(props){
                 }
                 )}
             </div>
-            {props.showOverlay ? 
+            {props.showWinOverlay ? 
                     <BoardOverlay></BoardOverlay>
                      :
                     ''
             }
-            
+            {props.showPreGameOverlay ? 
+                    <PreGameOverLay></PreGameOverLay>
+                    :
+                    ''
+            }
         </div>
-           
-        
-
-        
     );
 }
 export default Board;
