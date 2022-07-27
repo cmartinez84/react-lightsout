@@ -20,10 +20,16 @@ const PreGameOverLay = function(){
 }
 
 const Board = function(props){
+    const boop  = props.selectedWidth;
+
+    const boardSize = {
+        gridTemplateColumns: `repeat(${props.boardWidth}, 1fr)`,
+    }
+  
 
     return (
         <div  className="col-2" >
-            <div className='board'>
+            <div className='board' style={boardSize}>
                 {props.tiles.map((tile, i)=>{
                     return(
                         <Tile 

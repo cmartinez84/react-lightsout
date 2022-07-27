@@ -1,7 +1,7 @@
 
 import { Component } from 'react';
 import Board from './components/board/board.js';
-
+import Controls from './components/controls/controls.js';
 import './App.css';
 
 class App extends Component{
@@ -14,6 +14,8 @@ class App extends Component{
     showPreGameOverlay: true,
     demoMode: true, 
     gameInPlay: false, 
+    boardWidth: 5, 
+    selectedWidth: 5
   }
 
 
@@ -27,15 +29,15 @@ class App extends Component{
   }
 
   calculateAdjacentTiles(index){
-      const isRightEdge =  (index +1) % 5 === 0;
-      const isLeftEdge = index % 5 === 0;
-      const isBottomEdge = (index + 5) > 24;
-      const isTopEdge = index < 5;
+      const isRightEdge =  (index +1) % this.state.boardWidth === 0;
+      const isLeftEdge = index % this.state.boardWidth === 0;
+      const isBottomEdge = (index + this.state.boardWidth ) > (this.state.boardWidth * this.state.boardWidth) -1;
+      const isTopEdge = index < this.state.boardWidth;
   
       const toTheRight =  index +1;
       const toTheLeft = index -1;
-      const below = index + 5;
-      const above = index - 5;
+      const below = index + this.state.boardWidth;
+      const above = index - this.state.boardWidth;
   
       let tilesToFlip = [index];
   
@@ -92,24 +94,25 @@ class App extends Component{
 
 
   componentDidMount(){
-    const myArray = [];
-    let i = 0;
-      do {
-        myArray.push(false);
-        i++;
-      } while (i < 25);
-      this.setState({tiles: myArray});
     setTimeout(this.startDemoMode, 500)
     this.startButtonRef.focus();
     }
-
+    buildBoard(){
+      const myArray = [];
+      let i = 0;
+        do {
+          myArray.push(false);
+          i++;
+        } while (i < (this.state.selectedWidth * this.state.selectedWidth));
+        this.setState({tiles: myArray});
+    }
   
   createChaos=()=>{
     //theoretically, there are unbeatable boards. Generated actual plays from a blank board is an attempt to avoid that
     let preplays = [];
     const totalPreplays = Math.floor(Math.random() * 10) +2;
     for(let i = 0; i <totalPreplays ; i++){
-      const val = Math.floor(Math.random() * 25);
+      const val = Math.floor(Math.random() * (this.state.boardWidth * this.state.boardWidth));
       preplays.push(val);
     }
     let newTiles = [...this.state.tiles];
@@ -132,6 +135,7 @@ class App extends Component{
 
   startGame=()=>{  
     this.removeKeyBoardFunctionality();
+    this.buildBoard();
     this.setState({
       showWinOverlay: false,
       showPreGameOverlay: false,
@@ -139,7 +143,7 @@ class App extends Component{
       gameInPlay: true,
       demoMode: false, 
       highlightedTile: null,
-      tiles: this.state.tiles.map(tile=>false)
+      boardWidth: this.state.selectedWidth,
     })
     setTimeout(this.createChaos, 1000);
     setTimeout(this.addKeyBoardFunctionality, 1500);
@@ -161,12 +165,12 @@ class App extends Component{
           next = this.state.highlightedTile - 1;
         }
         else if(e.keyCode ===38){
-          next = this.state.highlightedTile -5;
+          next = this.state.highlightedTile - this.state.boardWidth;
         }
         else if(e.keyCode ===40){     
-          next = this.state.highlightedTile + 5;
+          next = this.state.highlightedTile + this.state.boardWidth;
         }
-        if(next >= 0 && next < 25)
+        if(next >= 0 && next < (this.state.boardWidth * this.state.boardWidth))
         this.setState({highlightedTile: next});
       }
       if(e.keyCode===32){
@@ -181,14 +185,14 @@ class App extends Component{
 
 
   calculateComputerMove=()=>{
-    const directionMath = [-5, 5, -1, 1];
+    const directionMath = [(0-this.state.boardWidth), this.state.boardWidth , -1, 1];
     let directionIndex = 0;
     let nextIndex = 0;
     do{
       directionIndex  = Math.floor(Math.random() * 4 );
       nextIndex = this.state.highlightedTile + directionMath[directionIndex];
     }
-    while( nextIndex > 24 || nextIndex < 0 );
+    while( nextIndex > ((this.state.boardWidth * this.state.boardWidth) - 1) || nextIndex < 0 );
     this.setState({highlightedTile: nextIndex});
 
     if(this.state.tiles[nextIndex]){
@@ -203,13 +207,18 @@ class App extends Component{
     setTimeout(this.calculateComputerMove, 500)
     // delay is purely aesthetic
   }
+  changeInput=(e)=>{
+    this.setState({boardWidth: e.target.value})
+  }
 
- 
+ setSelectedWidth=(selectedWidth)=>{
+    this.setState({selectedWidth: selectedWidth})
+    // this.buildBoard();
+ }
 
   render(){
     return (
-      <div className="page"
-      >
+      <div className="page">
         <div className="col-1">
         <div>        
           <h1 className='site-title'><span className="site-title-lights">LIGHTS</span><span className="site-title-out">OUT</span></h1>
@@ -221,17 +230,19 @@ class App extends Component{
             <p>Select a tile with either a mouseclick or the <span className="pink">[spacebar]</span></p>
             <p>Turn off all the lights with as few moves as possible!</p>
           </div> 
-        <div>
-          
+        <div className="all-buttons-container">
+          <Controls
+            selectedWidth={this.state.selectedWidth}
+            setSelectedWidth={this.setSelectedWidth}
+          ></Controls>
           <button 
-
               ref={ startButtonElement =>this.startButtonRef = startButtonElement}
               className="start-button"
               onClick={this.startGame}>NEW GAME
           </button>
           
-        </div>
           
+        </div>
         </div>
         <div>        
             <p className='score'>{this.state.plays}</p>
@@ -239,6 +250,8 @@ class App extends Component{
         </div>
       
         <Board
+          selectedWidth={this.state.selectedWidth}
+          boardWidth={this.state.boardWidth}
           gameInPlay={this.state.gameInPlay}
           showPreGameOverlay={this.state.showPreGameOverlay}
           showWinOverlay={this.state.showWinOverlay}

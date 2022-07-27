@@ -31,14 +31,13 @@
     font-family: 'Orbitron', sans-serif; 
     font-style: bold;
     padding: 6px;
-    padding-left: 40px;
-    padding-right: 40px;
-    border-radius: 14px;
+    border-radius: 10px;
     color: black;
     background: pink;
+    width: 165px;
 }
 .start-button:hover{
-    background: white
+    background: #fae7e7
 }
 .start-button:disabled{
     background-color: white;
@@ -59,4 +58,12 @@
 }
 .pink{
     color: pink;
+}
+
+
+.all-buttons-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
 }

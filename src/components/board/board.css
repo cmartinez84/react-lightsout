@@ -1,7 +1,7 @@
 .board{
     width: 500px;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    /* grid-template-columns: repeat(5, 1fr); */
     height: 500px;
     position: absolute
 }
