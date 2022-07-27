@@ -1,7 +1,6 @@
 import './board.css';
 import Tile from '../tile/tile';
 
-
 const BoardOverlay = function(){
     return(
         <div className="board board-overlay">
@@ -23,7 +22,7 @@ const PreGameOverLay = function(){
 const Board = function(props){
 
     return (
-        <div className="col-2">
+        <div  className="col-2" >
             <div className='board'>
                 {props.tiles.map((tile, i)=>{
                     return(

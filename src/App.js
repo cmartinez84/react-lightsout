@@ -1,13 +1,8 @@
 
-import { Component, useEffect } from 'react';
+import { Component } from 'react';
 import Board from './components/board/board.js';
 
-import { Button } from '@atomic-reactor/reactium-ui/Button';
-
 import './App.css';
-import { DirectionLtr, ThreeDGlasses } from '@atomic-reactor/reactium-ui/Icon/Linear';
-import { toBeInvalid } from '@testing-library/jest-dom/dist/matchers';
-
 
 class App extends Component{
 
@@ -18,7 +13,7 @@ class App extends Component{
     showWinOverlay: false, 
     showPreGameOverlay: true,
     demoMode: true, 
-    gameInPLay: false, 
+    gameInPlay: false, 
   }
 
 
@@ -76,10 +71,11 @@ class App extends Component{
       this.setState({
         showWinOverlay:true, 
         highlightedTile: null, 
-        gameInPLay: false, 
+        gameInPlay: false, 
         demoMode: true
       });
       this.startCelebrationSequence();
+      this.startButtonRef.focus();
     }
   }
   startCelebrationSequence=()=>{
@@ -103,8 +99,8 @@ class App extends Component{
         i++;
       } while (i < 25);
       this.setState({tiles: myArray});
-    document.addEventListener('keydown', this.navigateWithKeyboard);
     setTimeout(this.startDemoMode, 500)
+    this.startButtonRef.focus();
     }
 
   
@@ -124,49 +120,59 @@ class App extends Component{
         newTiles[index] = !newTiles[index];
       })
     });
-    this.setState({ tiles: newTiles, highlightedTile: null});
+    this.setState({ tiles: newTiles, highlightedTile: 0});
   }
-  startGame = ()=>{  
 
+  addKeyBoardFunctionality=()=>{
+    document.addEventListener('keydown', this.navigateWithKeyboard);
+  }
+  removeKeyBoardFunctionality=()=>{
+    document.removeEventListener('keydown', this.navigateWithKeyboard);
+  }
 
-    
+  startGame=()=>{  
+    this.removeKeyBoardFunctionality();
     this.setState({
       showWinOverlay: false,
       showPreGameOverlay: false,
       plays: 0, 
-      gameInPLay: true,
+      gameInPlay: true,
       demoMode: false, 
+      highlightedTile: null,
       tiles: this.state.tiles.map(tile=>false)
     })
-    setTimeout(this.createChaos, 600)
+    setTimeout(this.createChaos, 1000);
+    setTimeout(this.addKeyBoardFunctionality, 1500);
 
+    this.startButtonRef.blur();
   }
+
+
   navigateWithKeyboard=(e)=>{
-  
-    const moveKeys = [37, 38, 39, 40];
-    let next = '';
-    if(moveKeys.includes(e.keyCode)){
-      e.preventDefault();
-      if(e.keyCode === 39){
-        next = this.state.highlightedTile + 1;
+    if(this.state.gameInPlay){
+      const moveKeys = [37, 38, 39, 40];
+      let next = '';
+      if(moveKeys.includes(e.keyCode)){
+        e.preventDefault();
+        if(e.keyCode === 39){
+          next = this.state.highlightedTile + 1;
+        }
+        else if(e.keyCode ===37){
+          next = this.state.highlightedTile - 1;
+        }
+        else if(e.keyCode ===38){
+          next = this.state.highlightedTile -5;
+        }
+        else if(e.keyCode ===40){     
+          next = this.state.highlightedTile + 5;
+        }
+        if(next >= 0 && next < 25)
+        this.setState({highlightedTile: next});
       }
-      else if(e.keyCode ===37){
-        e.preventDefault()
-        next = this.state.highlightedTile - 1;
+      if(e.keyCode===32){
+        this.handleTileClick(this.state.highlightedTile);
       }
-      else if(e.keyCode ===38){
-        next = this.state.highlightedTile -5;
-      }
-      else if(e.keyCode ===40){      e.preventDefault()
-        next = this.state.highlightedTile + 5;
-      }
-      if(next >= 0 && next < 25)
-      this.setState({highlightedTile: next});
     }
-    if(e.keyCode===32){
-      this.handleTileClick(this.state.highlightedTile);
-    }
-    
   }
   
   handleHover=(index)=>{
@@ -195,6 +201,7 @@ class App extends Component{
   startDemoMode=()=>{
     this.createChaos();
     setTimeout(this.calculateComputerMove, 500)
+    // delay is purely aesthetic
   }
 
  
@@ -202,7 +209,7 @@ class App extends Component{
   render(){
     return (
       <div className="page"
-      onKeyDown={this.navigateWithKeyboard}>
+      >
         <div className="col-1">
         <div>        
           <h1 className='site-title'><span className="site-title-lights">LIGHTS</span><span className="site-title-out">OUT</span></h1>
@@ -217,6 +224,8 @@ class App extends Component{
         <div>
           
           <button 
+
+              ref={ startButtonElement =>this.startButtonRef = startButtonElement}
               className="start-button"
               onClick={this.startGame}>NEW GAME
           </button>
@@ -230,6 +239,7 @@ class App extends Component{
         </div>
       
         <Board
+          gameInPlay={this.state.gameInPlay}
           showPreGameOverlay={this.state.showPreGameOverlay}
           showWinOverlay={this.state.showWinOverlay}
           highlightedTile={this.state.highlightedTile}
@@ -243,5 +253,5 @@ class App extends Component{
   }
 }
 
-
 export default App;
+
