@@ -151,7 +151,6 @@ class App extends Component{
 
     this.startButtonRef.blur();
     this.col2ref.scrollIntoView()
-    console.log(this.col2ref.current)
   }
 
 
@@ -161,15 +160,29 @@ class App extends Component{
       let next = '';
       if(moveKeys.includes(e.keyCode)){
         e.preventDefault();
+        //right
         if(e.keyCode === 39){
-          next = this.state.highlightedTile + 1;
+          if((this.state.highlightedTile + 1) % 5 === 0){
+            next = this.state.highlightedTile;
+          }
+          else{
+            next = this.state.highlightedTile + 1;
+          }
         }
+        //left
         else if(e.keyCode ===37){
-          next = this.state.highlightedTile - 1;
+          if(this.state.highlightedTile % 5 === 0 ){
+            next = this.state.highlightedTile;
+          }
+          else{
+            next = this.state.highlightedTile - 1;
+          }
         }
+        //up
         else if(e.keyCode ===38){
           next = this.state.highlightedTile - this.state.boardWidth;
         }
+        //down
         else if(e.keyCode ===40){     
           next = this.state.highlightedTile + this.state.boardWidth;
         }
