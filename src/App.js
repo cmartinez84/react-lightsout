@@ -162,7 +162,7 @@ class App extends Component{
         e.preventDefault();
         //right
         if(e.keyCode === 39){
-          if((this.state.highlightedTile + 1) % 5 === 0){
+          if((this.state.highlightedTile + 1) % this.state.boardWidth === 0){
             next = this.state.highlightedTile;
           }
           else{
@@ -171,7 +171,7 @@ class App extends Component{
         }
         //left
         else if(e.keyCode ===37){
-          if(this.state.highlightedTile % 5 === 0 ){
+          if(this.state.highlightedTile % this.state.boardWidth === 0 ){
             next = this.state.highlightedTile;
           }
           else{
