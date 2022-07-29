@@ -1,9 +1,11 @@
 .board{
-    width: 500px;
+ 
     display: grid;
     /* grid-template-columns: repeat(5, 1fr); */
-    height: 500px;
-    position: absolute
+    width: 350px;
+    height: 350px;
+    position: absolute;
+    background: #343434;
 }
 
 .board-overlay{
@@ -19,6 +21,18 @@
 .good-job{
     font-size: 5.7em;
     grid-column: span 5;
-
 }
 
+@media only screen and (min-width: 500px) {
+    .board {
+      width: 500px;
+      height: 500px;
+    }
+  }
+
+  @media only screen and (min-width: 1200px) and (min-height: 800px){
+    .board {
+      width: 650px;
+      height: 650px;
+    }
+  }

@@ -1,5 +1,6 @@
 import './board.css';
 import Tile from '../tile/tile';
+import React from 'react';
 
 const BoardOverlay = function(){
     return(
@@ -19,7 +20,7 @@ const PreGameOverLay = function(){
     )
 }
 
-const Board = function(props){
+const Board = function(props, ref){
     const boop  = props.selectedWidth;
 
     const boardSize = {
@@ -28,7 +29,8 @@ const Board = function(props){
   
 
     return (
-        <div  className="col-2" >
+
+        <>
             <div className='board' style={boardSize}>
                 {props.tiles.map((tile, i)=>{
                     return(
@@ -53,7 +55,9 @@ const Board = function(props){
                     :
                     ''
             }
-        </div>
+            <div/>
+        </>
     );
 }
-export default Board;
+// export default Board;
+export default React.forwardRef(Board);

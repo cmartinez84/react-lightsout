@@ -3,6 +3,7 @@ import { Component } from 'react';
 import Board from './components/board/board.js';
 import Controls from './components/controls/controls.js';
 import './App.css';
+import { useRef } from 'react';
 
 class App extends Component{
 
@@ -17,7 +18,6 @@ class App extends Component{
     boardWidth: 5, 
     selectedWidth: 5
   }
-
 
   handleTileClick=(index)=>{
     
@@ -78,6 +78,7 @@ class App extends Component{
       });
       this.startCelebrationSequence();
       this.startButtonRef.focus();
+ 
     }
   }
   startCelebrationSequence=()=>{
@@ -149,6 +150,8 @@ class App extends Component{
     setTimeout(this.addKeyBoardFunctionality, 1500);
 
     this.startButtonRef.blur();
+    this.col2ref.scrollIntoView()
+    console.log(this.col2ref.current)
   }
 
 
@@ -220,17 +223,17 @@ class App extends Component{
     return (
       <div className="page">
         <div className="col-1">
-        <div>        
+        <div className="col-1-block-1" >        
           <h1 className='site-title'><span className="site-title-lights">LIGHTS</span><span className="site-title-out">OUT</span></h1>
         </div>
-        <div className="col-1-row-2">
+        <div className="col-1-block-2">
           <div className='instructions'>
             <p> The 90s are back!</p>
             <p>Usings either <span className="pink">← → ↑ ↓</span> or the mouse to navigate </p>
             <p>Select a tile with either a mouseclick or the <span className="pink">[spacebar]</span></p>
             <p>Turn off all the lights with as few moves as possible!</p>
           </div> 
-        <div className="all-buttons-container">
+        <div className=" all-buttons-container">
           <Controls
             selectedWidth={this.state.selectedWidth}
             setSelectedWidth={this.setSelectedWidth}
@@ -240,27 +243,28 @@ class App extends Component{
               className="start-button"
               onClick={this.startGame}>NEW GAME
           </button>
-          
-          
         </div>
         </div>
-        <div>        
+        <div className="col-1-block-3">        
             <p className='score'>{this.state.plays}</p>
         </div>
         </div>
-      
-        <Board
-          selectedWidth={this.state.selectedWidth}
-          boardWidth={this.state.boardWidth}
-          gameInPlay={this.state.gameInPlay}
-          showPreGameOverlay={this.state.showPreGameOverlay}
-          showWinOverlay={this.state.showWinOverlay}
-          highlightedTile={this.state.highlightedTile}
-          handleHover={this.handleHover}
-          handleTileClick={this.handleTileClick}
-          tiles={this.state.tiles}
-        ></Board>
+        <div className="col-2"  ref={col2Element => this.col2ref = col2Element}>
+          <Board 
+            selectedWidth={this.state.selectedWidth}
+            boardWidth={this.state.boardWidth}
+            gameInPlay={this.state.gameInPlay}
+            showPreGameOverlay={this.state.showPreGameOverlay}
+            showWinOverlay={this.state.showWinOverlay}
+            highlightedTile={this.state.highlightedTile}
+            handleHover={this.handleHover}
+            handleTileClick={this.handleTileClick}
+            tiles={this.state.tiles}
+          ></Board>
 
+        </div>
+
+   
       </div>
     )
   }

@@ -1,12 +1,11 @@
-.page{
-    display: grid;
-    grid-template-columns: 1.5fr 4fr;
-}
+
 .col-1{
     text-align: center;
     background-color: rgb(53, 53, 53);
-    padding-top: 3vh;
+    /* padding-top: 3vh; */
     display: grid;
+    height: 100vh;
+    min-height: 600px;
 }
 .col-2{
     display: flex;
@@ -15,6 +14,17 @@
     background-color: rgb(19, 21, 21);
     height: 100vh;
     position: relative;
+}
+.col-1-block-1{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.col-1-block-2{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
 }
 .site-title{
     color: white;
@@ -67,3 +77,16 @@
     align-items: center;
     gap: 8px;
 }
+
+@media only screen and (min-width: 785px) and (min-height: 560px){
+    .page{
+        display: grid;
+        grid-template-columns: 1.5fr 4fr;
+    }
+  }
+
+  @media only screen and (min-width: 1200px) and (min-height: 800px){
+   .site-title{
+    font-size: 3.5em;
+   }
+  }
