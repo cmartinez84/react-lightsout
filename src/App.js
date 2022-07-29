@@ -150,7 +150,7 @@ class App extends Component{
     setTimeout(this.addKeyBoardFunctionality, 1500);
 
     this.startButtonRef.blur();
-    this.col2ref.scrollIntoView()
+    this.col2ref.scrollIntoView({ behavior : "smooth"})
   }
 
 

@@ -2,7 +2,6 @@
 .col-1{
     text-align: center;
     background-color: rgb(53, 53, 53);
-    /* padding-top: 3vh; */
     display: grid;
     height: 100vh;
     min-height: 600px;
@@ -78,7 +77,7 @@
     gap: 8px;
 }
 
-@media only screen and (min-width: 785px) and (min-height: 560px){
+@media only screen and (min-width: 785px) and (min-height: 600px){
     .page{
         display: grid;
         grid-template-columns: 1.5fr 4fr;
