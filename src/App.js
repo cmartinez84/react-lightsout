@@ -109,7 +109,7 @@ class App extends Component{
     }
   
   createChaos=()=>{
-    //theoretically, there are unbeatable boards. Generated actual plays from a blank board is an attempt to avoid that
+    //theoretically, there are unbeatable boards. Generating actual plays from a blank board is an attempt to avoid that
     let preplays = [];
     const totalPreplays = Math.floor(Math.random() * 10) +2;
     for(let i = 0; i <totalPreplays ; i++){
@@ -162,7 +162,7 @@ class App extends Component{
         e.preventDefault();
         //right
         if(e.keyCode === 39){
-          if((this.state.highlightedTile + 1) % this.state.boardWidth === 0){
+          if((this.state.highlightedTile + 1) % this.state.boardWidthç === 0){
             next = this.state.highlightedTile;
           }
           else{
