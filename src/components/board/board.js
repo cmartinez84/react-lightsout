@@ -20,11 +20,10 @@ const PreGameOverLay = function(){
     )
 }
 
-const Board = function(props, ref){
-    const boop  = props.selectedWidth;
+const Board = function({boardWidth, highlightedTile, handleTileClick, handleHover, showWinOverlay, showPreGameOverlay, tiles}, ref){
 
     const boardSize = {
-        gridTemplateColumns: `repeat(${props.boardWidth}, 1fr)`,
+        gridTemplateColumns: `repeat(${boardWidth}, 1fr)`,
     }
   
 
@@ -32,12 +31,12 @@ const Board = function(props, ref){
 
         <>
             <div className='board' style={boardSize}>
-                {props.tiles.map((tile, i)=>{
+                {tiles.map((tile, i)=>{
                     return(
                         <Tile 
-                        highlightedTile={props.highlightedTile}
-                        handleTileClick={props.handleTileClick}
-                        handleHover={props.handleHover}
+                        highlightedTile={highlightedTile}
+                        handleTileClick={handleTileClick}
+                        handleHover={handleHover}
                         isLit= {tile}
                         index={i} 
                         key={i}></Tile>
@@ -45,12 +44,12 @@ const Board = function(props, ref){
                 }
                 )}
             </div>
-            {props.showWinOverlay ? 
+            {showWinOverlay ? 
                     <BoardOverlay></BoardOverlay>
                      :
                     ''
             }
-            {props.showPreGameOverlay ? 
+            {showPreGameOverlay ? 
                     <PreGameOverLay></PreGameOverLay>
                     :
                     ''

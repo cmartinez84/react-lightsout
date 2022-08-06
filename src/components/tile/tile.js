@@ -1,24 +1,24 @@
 import './tile.css';
 import { useState } from 'react';
 
-const Tile = function(props){
+const Tile = function({index, highlightedTile, isLit, handleTileClick, handleHover}){
     const [hoverState, setHoverState] = useState(false);
     const onTileClick = (index)=>{
-        props.handleTileClick(index);
+        handleTileClick(index);
     }
     const onHover=(index)=>{
-        props.handleHover(index);
+        handleHover(index);
     }
     
         return (
             <span className={'tile-container'}>
                 <span 
-                onMouseOver={()=>{onHover(props.index)}}
-                onClick={()=>{onTileClick(props.index)}}
+                onMouseOver={()=>{onHover(index)}}
+                onClick={()=>{onTileClick(index)}}
                 className={
-                    `${props.highlightedTile === props.index ? 'hovered' : ' '} 
-                     ${props.isLit ? 'tile-lit': 'tile-dark'}
-                    tile`}> {props.index} </span>
+                    `${highlightedTile === index ? 'hovered' : ' '} 
+                     ${isLit ? 'tile-lit': 'tile-dark'}
+                    tile`}>  </span>
             </span>
         )
 }

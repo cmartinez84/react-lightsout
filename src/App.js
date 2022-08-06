@@ -4,17 +4,17 @@ import Board from './components/board/board.js';
 import Controls from './components/controls/controls.js';
 import './App.css';
 import { useRef } from 'react';
+import ScoreContainer from './components/ScoreContainer/ScoreContainer.js';
 
 
 // 5 6 7 8 9 10
 // 25 36 49 64 81 100
 //   11 13 15 17 19  
     // 2
-// Win does not ask to play again, it just draws new board. 
 // Store the preplays in state
 //Cannot change levels while game in play
 
-// Preplays start
+// Game difficulty starts easy and increasese with ever successive win. Difficulty is mathmatically proportionate for all board areas. New game starts immediately after win and gets increasingly difficult. 
 
 class App extends Component{
 
@@ -29,8 +29,10 @@ class App extends Component{
     boardWidth: 5, 
     boardArea: 25,
     selectedWidth: 5, 
-    difficlty: 2, 
-    preplays: []
+    difficulty: 2, 
+    preplays: [], 
+    tryAgain: false, 
+    disableNewGameButton: false
   }
 
   handleTileClick=(index)=>{
@@ -84,35 +86,30 @@ class App extends Component{
   checkForWin(newTiles){
     const allLightsOut = newTiles.every(tile => tile === false);
     if (allLightsOut){
+      console.log(allLightsOut)
       this.removeKeyBoardFunctionality();
-      this.setState({ difficlty: this.state.difficlty + 1 })
-      this.startGame();
-      // this.setState({
-      //   showWinOverlay:true, 
-      //   highlightedTile: null, 
-      //   gameInPlay: false, 
-      //   demoMode: true
-      // });
-      // this.startCelebrationSequence();
-      // this.startButtonRef.focus();
+      this.setState({difficulty : this.state.difficulty + 1 })
+      console.log(this.state)
+      this.startGame(false, false);
     }
   }
-  startCelebrationSequence=()=>{
-    const allFalse = this.state.tiles.map(tile=>false);
-    const allTrue = this.state.tiles.map(tile=>true);
-    setTimeout(()=>{this.setState({tiles: allTrue})}, 500)
-    setTimeout(()=>{this.setState({tiles: allFalse})}, 1000)
-    setTimeout(()=>{this.setState({tiles: allTrue})}, 1500)
-    setTimeout(()=>{this.setState({tiles: allFalse})}, 2000)
-    setTimeout(()=>{this.setState({tiles: allTrue})}, 2500)
-    setTimeout(()=>{this.setState({tiles: allFalse})}, 3000)
-
-  }
+  // startCelebrationSequence=()=>{
+  //   const allFalse = this.state.tiles.map(tile=>false);
+  //   const allTrue = this.state.tiles.map(tile=>true);
+  //   setTimeout(()=>{this.setState({tiles: allTrue})}, 500)
+  //   setTimeout(()=>{this.setState({tiles: allFalse})}, 1000)
+  //   setTimeout(()=>{this.setState({tiles: allTrue})}, 1500)
+  //   setTimeout(()=>{this.setState({tiles: allFalse})}, 2000)
+  //   setTimeout(()=>{this.setState({tiles: allTrue})}, 2500)
+  //   setTimeout(()=>{this.setState({tiles: allFalse})}, 3000)
+  // }
 
 
   componentDidMount(){
     setTimeout(this.startDemoMode, 500)
-    this.startButtonRef.focus();
+    if(!this.state.gameInPlay){
+      this.startButtonRef.focus();
+    }
     }
     buildBoard(){
       const myArray = [];
@@ -126,16 +123,23 @@ class App extends Component{
   
   createChaos=()=>{
     //theoretically, there are unbeatable boards. Generated actual plays from a blank board is an attempt to avoid that
-    let preplays = [];
-    const scaleDifficulty = Math.ceil((this.state.difficlty * this.state.boardArea) / 25)
-    console.log(scaleDifficulty) 
-    // const totalPreplays = Math.floor(Math.random() * 10) +2;
-    for(let i = 0; i <scaleDifficulty ; i++){
-      const val = Math.floor(Math.random() * (this.state.boardArea));
-      if(preplays.indexOf(val) === -1) {
-          preplays.push(val)
+    let preplays = this.state.preplays;
+
+    const scaleDifficulty = Math.ceil((this.state.difficulty * this.state.boardArea) / 25)
+    console.log(scaleDifficulty)
+    console.log(this.state.difficulty)
+    
+    if(!this.state.tryAgain){
+      // if(true){
+      preplays=[];
+      for(let i = 0; i <scaleDifficulty ; i++){
+        const val = Math.floor(Math.random() * (this.state.boardArea));
+        if(preplays.indexOf(val) === -1) {
+            preplays.push(val)
+        }
       }
     }
+   
     let newTiles = [...this.state.tiles];
 
     preplays.forEach((preplay)=>{
@@ -144,10 +148,13 @@ class App extends Component{
         newTiles[index] = !newTiles[index];
       })
     });
+    //setState is not working on plays when being implemented in startGame
     this.setState({ 
       tiles: newTiles,
-       highlightedTile: 0, 
-        preplays
+      plays:0,
+      highlightedTile: 0, 
+      preplays, 
+      disableNewGameButton: false
     });
   }
 
@@ -157,27 +164,45 @@ class App extends Component{
   removeKeyBoardFunctionality=()=>{
     document.removeEventListener('keydown', this.navigateWithKeyboard);
   }
+  handleClickStart=()=>{
+    this.setState({difficulty: 2})
+    this.startGame();
+    console.log(this.state.difficulty)
+  }
+  handleClicktryagain=()=>{
+    this.setState({tryAgain: 2})
+    this.startGame();
+  }
 
+  //used for Try Again and automatically restarting after win
   startGame=()=>{  
+    // newBoard is for any new pattern, whether try again or not
     this.removeKeyBoardFunctionality();
+    //build board builds blank board only
     this.buildBoard();
     this.setState({
       showWinOverlay: false,
       showPreGameOverlay: false,
-      plays: 0, 
       gameInPlay: true,
       demoMode: false, 
       highlightedTile: null,
       boardWidth: this.state.selectedWidth,
+      plays: 0, 
+      tiles:  this.state.tiles.map(tile=>false), 
+      disableNewGameButton: true
     })
+
     setTimeout(this.createChaos, 1000);
     setTimeout(this.addKeyBoardFunctionality, 1500);
 
     this.startButtonRef.blur();
+    //accounts for possible delays in enacting state
     this.col2ref.scrollIntoView({ behavior : "smooth"})
+    
 
   }
 
+ 
 
   navigateWithKeyboard=(e)=>{
     if(this.state.gameInPlay){
@@ -267,42 +292,60 @@ class App extends Component{
         </div>
         <div className="col-1-block-2">
           <div className='instructions'>
-            <p>{this.state.difficlty}</p>
-            <p>Cheat</p>
-            <p>{this.state.preplays.join(' ')}</p>
             <p> The 90s are back!</p>
             <p>Usings either <span className="pink">← → ↑ ↓</span> or the mouse to navigate </p>
             <p>Select a tile with either a mouseclick or the <span className="pink">[spacebar]</span></p>
-            <p>Turn off all the lights with as few moves as possible!</p>
+            <p>Turn off all the lights with as few moves as possible! {this.state.plays}</p>
           </div> 
         <div className=" all-buttons-container">
           <Controls
+            gameInPlay={this.state.gameInPlay}
             selectedWidth={this.state.selectedWidth}
             setSelectedWidth={this.setSelectedWidth}
           ></Controls>
+          {/* start game args are tryAgain, resetLevels */}
           <button 
+              disabled={this.state.disableNewGameButton}
               ref={ startButtonElement =>this.startButtonRef = startButtonElement}
               className="start-button"
-              onClick={this.startGame}>NEW GAME
+              onClick={this.handleClickStart}>NEW GAME
+          </button>
+          <button 
+              disabled={!this.state.gameInPlay}
+              className="start-button"
+              onClick={this.handleClicktryagain}>TRY AGAIN
+          </button>
+          <button 
+              disabled={!this.state.gameInPlay}
+              className="start-button"
+              onClick={this.startGame}>HINT MODE
           </button>
         </div>
         </div>
-        <div className="col-1-block-3">        
-            <p className='score'>{this.state.plays}</p>
+        <div className="col-1-block-3">   
         </div>
         </div>
         <div className="col-2"  ref={col2Element => this.col2ref = col2Element}>
-          <Board 
-            selectedWidth={this.state.selectedWidth}
-            boardWidth={this.state.boardWidth}
-            gameInPlay={this.state.gameInPlay}
-            showPreGameOverlay={this.state.showPreGameOverlay}
-            showWinOverlay={this.state.showWinOverlay}
-            highlightedTile={this.state.highlightedTile}
-            handleHover={this.handleHover}
-            handleTileClick={this.handleTileClick}
-            tiles={this.state.tiles}
-          ></Board>
+        <div className='col-2-row-1'>
+            <Board 
+              selectedWidth={this.state.selectedWidth}
+              boardWidth={this.state.boardWidth}
+              showPreGameOverlay={this.state.showPreGameOverlay}
+              showWinOverlay={this.state.showWinOverlay}
+              highlightedTile={this.state.highlightedTile}
+              handleHover={this.handleHover}
+              handleTileClick={this.handleTileClick}
+              tiles={this.state.tiles}
+            ></Board>
+          </div>
+          <div className='col-2-row-2'>
+            <ScoreContainer
+              score={this.state.plays}
+              goal={this.state.preplays.length}
+            />
+          </div>
+          
+         
 
         </div>
 
