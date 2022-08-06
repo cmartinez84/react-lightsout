@@ -5,6 +5,17 @@ import Controls from './components/controls/controls.js';
 import './App.css';
 import { useRef } from 'react';
 
+
+// 5 6 7 8 9 10
+// 25 36 49 64 81 100
+//   11 13 15 17 19  
+    // 2
+// Win does not ask to play again, it just draws new board. 
+// Store the preplays in state
+//Cannot change levels while game in play
+
+// Preplays start
+
 class App extends Component{
 
   state = {
@@ -16,7 +27,10 @@ class App extends Component{
     demoMode: true, 
     gameInPlay: false, 
     boardWidth: 5, 
-    selectedWidth: 5
+    boardArea: 25,
+    selectedWidth: 5, 
+    difficlty: 2, 
+    preplays: []
   }
 
   handleTileClick=(index)=>{
@@ -31,7 +45,7 @@ class App extends Component{
   calculateAdjacentTiles(index){
       const isRightEdge =  (index +1) % this.state.boardWidth === 0;
       const isLeftEdge = index % this.state.boardWidth === 0;
-      const isBottomEdge = (index + this.state.boardWidth ) > (this.state.boardWidth * this.state.boardWidth) -1;
+      const isBottomEdge = (index + this.state.boardWidth ) > (this.state.boardArea) -1;
       const isTopEdge = index < this.state.boardWidth;
   
       const toTheRight =  index +1;
@@ -70,15 +84,17 @@ class App extends Component{
   checkForWin(newTiles){
     const allLightsOut = newTiles.every(tile => tile === false);
     if (allLightsOut){
-      this.setState({
-        showWinOverlay:true, 
-        highlightedTile: null, 
-        gameInPlay: false, 
-        demoMode: true
-      });
-      this.startCelebrationSequence();
-      this.startButtonRef.focus();
- 
+      this.removeKeyBoardFunctionality();
+      this.setState({ difficlty: this.state.difficlty + 1 })
+      this.startGame();
+      // this.setState({
+      //   showWinOverlay:true, 
+      //   highlightedTile: null, 
+      //   gameInPlay: false, 
+      //   demoMode: true
+      // });
+      // this.startCelebrationSequence();
+      // this.startButtonRef.focus();
     }
   }
   startCelebrationSequence=()=>{
@@ -111,10 +127,14 @@ class App extends Component{
   createChaos=()=>{
     //theoretically, there are unbeatable boards. Generated actual plays from a blank board is an attempt to avoid that
     let preplays = [];
-    const totalPreplays = Math.floor(Math.random() * 10) +2;
-    for(let i = 0; i <totalPreplays ; i++){
-      const val = Math.floor(Math.random() * (this.state.boardWidth * this.state.boardWidth));
-      preplays.push(val);
+    const scaleDifficulty = Math.ceil((this.state.difficlty * this.state.boardArea) / 25)
+    console.log(scaleDifficulty) 
+    // const totalPreplays = Math.floor(Math.random() * 10) +2;
+    for(let i = 0; i <scaleDifficulty ; i++){
+      const val = Math.floor(Math.random() * (this.state.boardArea));
+      if(preplays.indexOf(val) === -1) {
+          preplays.push(val)
+      }
     }
     let newTiles = [...this.state.tiles];
 
@@ -124,7 +144,11 @@ class App extends Component{
         newTiles[index] = !newTiles[index];
       })
     });
-    this.setState({ tiles: newTiles, highlightedTile: 0});
+    this.setState({ 
+      tiles: newTiles,
+       highlightedTile: 0, 
+        preplays
+    });
   }
 
   addKeyBoardFunctionality=()=>{
@@ -151,6 +175,7 @@ class App extends Component{
 
     this.startButtonRef.blur();
     this.col2ref.scrollIntoView({ behavior : "smooth"})
+
   }
 
 
@@ -186,7 +211,7 @@ class App extends Component{
         else if(e.keyCode ===40){     
           next = this.state.highlightedTile + this.state.boardWidth;
         }
-        if(next >= 0 && next < (this.state.boardWidth * this.state.boardWidth))
+        if(next >= 0 && next < (this.state.boardArea))
         this.setState({highlightedTile: next});
       }
       if(e.keyCode===32){
@@ -199,6 +224,11 @@ class App extends Component{
     this.setState({ highlightedTile: index})
   }
 
+  startDemoMode=()=>{
+    this.createChaos();
+    setTimeout(this.calculateComputerMove, 500)
+    // delay is purely aesthetic
+  }
 
   calculateComputerMove=()=>{
     const directionMath = [(0-this.state.boardWidth), this.state.boardWidth , -1, 1];
@@ -208,7 +238,7 @@ class App extends Component{
       directionIndex  = Math.floor(Math.random() * 4 );
       nextIndex = this.state.highlightedTile + directionMath[directionIndex];
     }
-    while( nextIndex > ((this.state.boardWidth * this.state.boardWidth) - 1) || nextIndex < 0 );
+    while( nextIndex > ((this.state.boardArea) - 1) || nextIndex < 0 );
     this.setState({highlightedTile: nextIndex});
 
     if(this.state.tiles[nextIndex]){
@@ -218,18 +248,14 @@ class App extends Component{
     setTimeout(this.calculateComputerMove, 1000)
   }
 
-  startDemoMode=()=>{
-    this.createChaos();
-    setTimeout(this.calculateComputerMove, 500)
-    // delay is purely aesthetic
-  }
-  changeInput=(e)=>{
-    this.setState({boardWidth: e.target.value})
-  }
+
+  // changeInput=(e)=>{
+  //   this.setState({boardWidth: e.target.value})
+  // }
 
  setSelectedWidth=(selectedWidth)=>{
-    this.setState({selectedWidth: selectedWidth})
-    // this.buildBoard();
+    const boardArea = selectedWidth * selectedWidth;
+    this.setState({selectedWidth, boardArea})
  }
 
   render(){
@@ -241,6 +267,9 @@ class App extends Component{
         </div>
         <div className="col-1-block-2">
           <div className='instructions'>
+            <p>{this.state.difficlty}</p>
+            <p>Cheat</p>
+            <p>{this.state.preplays.join(' ')}</p>
             <p> The 90s are back!</p>
             <p>Usings either <span className="pink">← → ↑ ↓</span> or the mouse to navigate </p>
             <p>Select a tile with either a mouseclick or the <span className="pink">[spacebar]</span></p>

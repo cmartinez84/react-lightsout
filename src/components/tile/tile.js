@@ -18,7 +18,7 @@ const Tile = function(props){
                 className={
                     `${props.highlightedTile === props.index ? 'hovered' : ' '} 
                      ${props.isLit ? 'tile-lit': 'tile-dark'}
-                    tile`}>  </span>
+                    tile`}> {props.index} </span>
             </span>
         )
 }
