@@ -20,7 +20,7 @@ const PreGameOverLay = function(){
     )
 }
 
-const Board = function({boardWidth, highlightedTile, handleTileClick, handleHover, showWinOverlay, showPreGameOverlay, tiles}, ref){
+const Board = function({boardWidth, highlightedTile, handleTileClick, handleHover, showWinOverlay, showPreGameOverlay, tiles, stagedHint}, ref){
 
     const boardSize = {
         gridTemplateColumns: `repeat(${boardWidth}, 1fr)`,
@@ -34,6 +34,7 @@ const Board = function({boardWidth, highlightedTile, handleTileClick, handleHove
                 {tiles.map((tile, i)=>{
                     return(
                         <Tile 
+                        stagedHint={stagedHint}
                         highlightedTile={highlightedTile}
                         handleTileClick={handleTileClick}
                         handleHover={handleHover}

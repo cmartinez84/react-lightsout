@@ -82,7 +82,7 @@
     color: white;
     text-align: left;
     padding: 23px;
-    font-size: 1em;
+    font-size: .75em;
 }
 .pink{
     color: pink;
@@ -101,10 +101,15 @@
         display: grid;
         grid-template-columns: 1.5fr 4fr;
     }
+   
   }
 
   @media only screen and (min-width: 1200px) and (min-height: 800px){
    .site-title{
     font-size: 3em;
    }
+   .instructions{
+    font-size: 1em;
+    }
+
   }

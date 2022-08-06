@@ -7,10 +7,6 @@ import { useRef } from 'react';
 import ScoreContainer from './components/ScoreContainer/ScoreContainer.js';
 
 
-
-
-// Game difficulty starts easy and increasese with ever successive win. Difficulty is mathmatically proportionate for all board areas. New game starts immediately after win and gets increasingly difficult. 
-
 class App extends Component{
 
   state = {
@@ -27,7 +23,9 @@ class App extends Component{
     difficulty: 2, 
     preplays: [], 
     tryAgain: false, 
-    disableNewGameButton: false
+    disableNewGameButton: false, 
+    hints: [],
+    stagedHint: null
   }
 
   handleTileClick=(index)=>{
@@ -35,8 +33,43 @@ class App extends Component{
     const tilesToFlip = this.calculateAdjacentTiles(index);
     this.flipAdjacentTiles(tilesToFlip);
     if(!this.state.demoMode){
-      this.setState({plays: this.state.plays + 1 })      
+      this.setState({
+        plays: this.state.plays + 1,
+      })      
     }
+    this.addClickToHints(index)
+    this.checkIfUserFollowedHint(index)
+
+  }
+
+  addClickToHints=(val)=>{
+    
+    const occurrences = this.state.hints.filter(  x =>  x === val)
+    console.log(occurrences.length)
+
+    if(occurrences.length === 0){
+      this.setState({hints: [...this.state.hints, val]});
+    } 
+    else if(occurrences.length === 1 ){
+      const hints = this.state.hints.filter(x => x !== val)
+      this.setState({hints})
+    }
+    
+  }
+  handleClickHint=()=>{
+    this.setState({stagedHint: this.state.hints[0]})
+    this.hintButtonRef.blur();
+    this.col2ref.scrollIntoView({ behavior : "smooth"})
+
+
+  }
+
+  checkIfUserFollowedHint=(val)=>{
+    if(val === this.state.stagedHint){
+      var hints = this.state.hints.filter(x=> x !== val)
+      this.setState({hints})
+    }
+    this.setState({stagedHint: null})
   }
 
   calculateAdjacentTiles(index){
@@ -81,23 +114,11 @@ class App extends Component{
   checkForWin(newTiles){
     const allLightsOut = newTiles.every(tile => tile === false);
     if (allLightsOut){
-      console.log(allLightsOut)
       this.removeKeyBoardFunctionality();
       this.setState({difficulty : this.state.difficulty + 1 })
-      console.log(this.state)
       this.startGame(false, false);
     }
   }
-  // startCelebrationSequence=()=>{
-  //   const allFalse = this.state.tiles.map(tile=>false);
-  //   const allTrue = this.state.tiles.map(tile=>true);
-  //   setTimeout(()=>{this.setState({tiles: allTrue})}, 500)
-  //   setTimeout(()=>{this.setState({tiles: allFalse})}, 1000)
-  //   setTimeout(()=>{this.setState({tiles: allTrue})}, 1500)
-  //   setTimeout(()=>{this.setState({tiles: allFalse})}, 2000)
-  //   setTimeout(()=>{this.setState({tiles: allTrue})}, 2500)
-  //   setTimeout(()=>{this.setState({tiles: allFalse})}, 3000)
-  // }
 
 
   componentDidMount(){
@@ -146,7 +167,10 @@ class App extends Component{
       plays:0,
       highlightedTile: 0, 
       preplays, 
-      disableNewGameButton: false
+      disableNewGameButton: false,
+      hints: [...preplays], 
+      stagedHint: null
+
     });
   }
 
@@ -157,12 +181,16 @@ class App extends Component{
     document.removeEventListener('keydown', this.navigateWithKeyboard);
   }
   handleClickStart=()=>{
+    this.startButtonRef.blur();
     this.setState({difficulty: 2})
     this.startGame();
-    console.log(this.state.difficulty)
   }
   handleClicktryagain=()=>{
+    this.tryAgainButtonRef.blur();
+    this.col2ref.scrollIntoView({ behavior : "smooth"})
+
     this.setState({tryAgain: true})
+    console.log(this.state)
     this.startGame();
   }
 
@@ -181,13 +209,13 @@ class App extends Component{
       boardWidth: this.state.selectedWidth,
       plays: 0, 
       tiles:  this.state.tiles.map(tile=>false), 
-      disableNewGameButton: true
+      disableNewGameButton: true, 
+      hintIndex: 0
     })
 
     setTimeout(this.createChaos, 1000);
     setTimeout(this.addKeyBoardFunctionality, 1500);
 
-    this.startButtonRef.blur();
     //accounts for possible delays in enacting state
     this.col2ref.scrollIntoView({ behavior : "smooth"})
     
@@ -233,6 +261,9 @@ class App extends Component{
       }
       if(e.keyCode===32){
         this.handleTileClick(this.state.highlightedTile);
+      }
+      if(e.keyCode===72){
+        this.handleClickHint()
       }
     }
   }
@@ -287,7 +318,8 @@ class App extends Component{
             <p> The 90s are back!</p>
             <p>Usings either <span className="pink">← → ↑ ↓</span> or the mouse to navigate </p>
             <p>Select a tile with either a mouseclick or the <span className="pink">[spacebar]</span></p>
-            <p>Turn off all the lights with as few moves as possible! {this.state.plays}</p>
+            <p>Stuck?  Type <span className='pink'>H</span> or click <span className='pink'>HINT</span> for a suggestion</p>
+            <p>Turn off all the lights with as few moves as possible! </p>
           </div> 
         <div className=" all-buttons-container">
           <Controls
@@ -297,19 +329,21 @@ class App extends Component{
           ></Controls>
           <button 
               disabled={this.state.disableNewGameButton}
-              ref={ startButtonElement =>this.startButtonRef = startButtonElement}
+              ref={ e =>this.startButtonRef = e}
               className="start-button"
               onClick={this.handleClickStart}>NEW GAME
           </button>
           <button 
               disabled={!this.state.gameInPlay}
+              ref={ e =>this.tryAgainButtonRef = e}
               className="start-button"
               onClick={this.handleClicktryagain}>TRY AGAIN
           </button>
           <button 
               disabled={!this.state.gameInPlay}
+              ref={ e =>this.hintButtonRef = e}
               className="start-button"
-              onClick={this.startGame}>HINT MODE
+              onClick={this.handleClickHint}>HINT MODE
           </button>
         </div>
         </div>
@@ -319,6 +353,7 @@ class App extends Component{
         <div className="col-2"  ref={col2Element => this.col2ref = col2Element}>
         <div className='col-2-row-1'>
             <Board 
+              stagedHint={this.state.stagedHint}
               selectedWidth={this.state.selectedWidth}
               boardWidth={this.state.boardWidth}
               showPreGameOverlay={this.state.showPreGameOverlay}
@@ -335,12 +370,7 @@ class App extends Component{
               goal={this.state.preplays.length}
             />
           </div>
-          
-         
-
         </div>
-
-   
       </div>
     )
   }
