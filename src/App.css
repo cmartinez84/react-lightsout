@@ -8,12 +8,24 @@
 }
 .col-2{
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: space-between;
     background-color: rgb(19, 21, 21);
     height: 100vh;
     position: relative;
+
 }
+.col-2-row-1{
+    flex-basis: 97vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.col-2-row-2{
+    /* background: lightgreen */
+}
+
 .col-1-block-1{
     display: flex;
     justify-content: center;
@@ -51,11 +63,18 @@
 .start-button:disabled{
     background-color: white;
 }
-.score{
-    font-size: 45px;
-    color: white;
-    font-family: 'Orbitron', sans-serif;
+
+.col-1-block-3{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 }
+.col-1-block-2 div{
+    flex: 1
+}
+
+
+
 
 .instructions{
     font-family: 'Orbitron', sans-serif;
@@ -86,6 +105,6 @@
 
   @media only screen and (min-width: 1200px) and (min-height: 800px){
    .site-title{
-    font-size: 3.5em;
+    font-size: 3em;
    }
   }

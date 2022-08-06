@@ -1,0 +1,23 @@
+.score-container{
+    display: none;
+    justify-content: flex-end;
+}
+.score-container div{
+    padding-bottom: 13px;
+    padding-right: 15px
+}
+.score{
+    font-size: 1.5em;
+    margin: 0;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+}
+.pink{
+    color: pink
+}
+
+@media only screen and (min-height: 500px) {
+        .score-container{
+            display: flex
+        }
+  }
