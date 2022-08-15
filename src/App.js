@@ -13,13 +13,12 @@ class App extends Component{
     tiles: new Array(25),
     plays: 0, 
     highlightedTile: null, 
-    showWinOverlay: false, 
     showPreGameOverlay: true,
     demoMode: true, 
     gameInPlay: false, 
-    boardWidth: 5, 
-    boardArea: 25,
-    selectedWidth: 5, 
+    boardWidth: 5, //after it is selected, used for calculations during game
+    boardArea: 25, 
+    selectedWidth: 5, //changes with user selection, does not enact until new round or game starts
     difficulty: 2, 
     preplays: [], 
     tryAgain: false, 
@@ -42,10 +41,10 @@ class App extends Component{
 
   }
 
+     //essetially, clicking on the same tiles in any order produces the same results. this tracks which tiles have been clicked 0 or 1 times. if 2, the clicks cancel eachother out.
   addClickToHints=(val)=>{
-    
+ 
     const occurrences = this.state.hints.filter(  x =>  x === val)
-    console.log(occurrences.length)
 
     if(occurrences.length === 0){
       this.setState({hints: [...this.state.hints, val]});
@@ -56,12 +55,11 @@ class App extends Component{
     }
     
   }
+
   handleClickHint=()=>{
     this.setState({stagedHint: this.state.hints[0]})
     this.hintButtonRef.blur();
-    this.col2ref.scrollIntoView({ behavior : "smooth"})
-
-
+    this.bottomElementRef.scrollIntoView({ behavior : "smooth"})
   }
 
   checkIfUserFollowedHint=(val)=>{
@@ -128,13 +126,14 @@ class App extends Component{
     }
     }
     buildBoard(){
-      const myArray = [];
+      const tiles = [];
       let i = 0;
         do {
-          myArray.push(false);
+          tiles.push(false);
           i++;
         } while (i < (this.state.selectedWidth * this.state.selectedWidth));
-        this.setState({tiles: myArray});
+        // this.setState({tiles});
+      return tiles
     }
   
   createChaos=()=>{
@@ -154,6 +153,7 @@ class App extends Component{
     }
    
     let newTiles = [...this.state.tiles];
+    
 
     preplays.forEach((preplay)=>{
       const tilesToFlip = this.calculateAdjacentTiles(preplay);
@@ -180,47 +180,48 @@ class App extends Component{
   removeKeyBoardFunctionality=()=>{
     document.removeEventListener('keydown', this.navigateWithKeyboard);
   }
-  handleClickStart=()=>{
-    this.startButtonRef.blur();
-    this.setState({difficulty: 2})
-    this.startGame();
-  }
-  handleClicktryagain=()=>{
-    this.tryAgainButtonRef.blur();
-    this.col2ref.scrollIntoView({ behavior : "smooth"})
 
-    this.setState({tryAgain: true})
-    console.log(this.state)
-    this.startGame();
-  }
 
   //used for New Game,  Try Again and automatically restarting after win
+  //boardArea and boardWidth are used for navigation purposes only
+  //buildBoard function makes an array of false(lights out) values, based on selectedWidth
+  //disableNewGameButton state prevents user from generating more than one game, which causes a glitch
+  //The setTimeouts are to prevent the actions from being carried out before the state is set, as they both rely on the previous values being set
   startGame=()=>{  
-    // newBoard is for any new pattern, whether try again or not
     this.removeKeyBoardFunctionality();
-    //build board builds blank board only
-    this.buildBoard();
     this.setState({
-      showWinOverlay: false,
       showPreGameOverlay: false,
       gameInPlay: true,
       demoMode: false, 
       highlightedTile: null,
       boardWidth: this.state.selectedWidth,
-      plays: 0, 
-      tiles:  this.state.tiles.map(tile=>false), 
+      tiles:  this.buildBoard(),
       disableNewGameButton: true, 
-      hintIndex: 0
+      hintIndex: 0, 
+      boardArea: this.state.selectedWidth * this.state.selectedWidth
     })
 
     setTimeout(this.createChaos, 1000);
     setTimeout(this.addKeyBoardFunctionality, 1500);
 
-    //accounts for possible delays in enacting state
-    this.col2ref.scrollIntoView({ behavior : "smooth"})
-    
-
+    this.bottomElementRef.scrollIntoView({ behavior : "smooth"})
   }
+
+  handleClickNewGame=()=>{
+    //blur allows user to start using keyboard navigation right away
+    this.startButtonRef.blur();
+    this.setState({difficulty: 2})
+    this.startGame();
+  }
+  
+  handleClicktryagain=()=>{
+    this.tryAgainButtonRef.blur();
+    this.bottomElementRef.scrollIntoView({ behavior : "smooth"})
+
+    this.setState({tryAgain: true})
+    this.startGame();
+  }
+
 
  
 
@@ -297,13 +298,8 @@ class App extends Component{
   }
 
 
-  // changeInput=(e)=>{
-  //   this.setState({boardWidth: e.target.value})
-  // }
-
  setSelectedWidth=(selectedWidth)=>{
-    const boardArea = selectedWidth * selectedWidth;
-    this.setState({selectedWidth, boardArea})
+    this.setState({selectedWidth})
  }
 
   render(){
@@ -323,7 +319,6 @@ class App extends Component{
           </div> 
         <div className=" all-buttons-container">
           <Controls
-            gameInPlay={this.state.gameInPlay}
             selectedWidth={this.state.selectedWidth}
             setSelectedWidth={this.setSelectedWidth}
           ></Controls>
@@ -331,7 +326,7 @@ class App extends Component{
               disabled={this.state.disableNewGameButton}
               ref={ e =>this.startButtonRef = e}
               className="start-button"
-              onClick={this.handleClickStart}>NEW GAME
+              onClick={this.handleClickNewGame}>NEW GAME
           </button>
           <button 
               disabled={!this.state.gameInPlay}
@@ -350,21 +345,20 @@ class App extends Component{
         <div className="col-1-block-3">   
         </div>
         </div>
-        <div className="col-2"  ref={col2Element => this.col2ref = col2Element}>
+        <div className="col-2"  >
         <div className='col-2-row-1'>
             <Board 
               stagedHint={this.state.stagedHint}
               selectedWidth={this.state.selectedWidth}
               boardWidth={this.state.boardWidth}
               showPreGameOverlay={this.state.showPreGameOverlay}
-              showWinOverlay={this.state.showWinOverlay}
               highlightedTile={this.state.highlightedTile}
               handleHover={this.handleHover}
               handleTileClick={this.handleTileClick}
               tiles={this.state.tiles}
             ></Board>
           </div>
-          <div className='col-2-row-2'>
+          <div className='col-2-row-2'  ref={col2Element => this.bottomElementRef = col2Element}>
             <ScoreContainer
               score={this.state.plays}
               goal={this.state.preplays.length}

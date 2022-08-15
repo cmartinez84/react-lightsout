@@ -2,7 +2,7 @@ import { useState } from "react"
 import './controls.css';
 
 
-const Controls = function({selectedWidth, gameInPlay, setSelectedWidth}){
+const Controls = function({selectedWidth, setSelectedWidth}){
 
     const selectedStyle = {
         backgroundColor: "white"
@@ -14,14 +14,12 @@ const Controls = function({selectedWidth, gameInPlay, setSelectedWidth}){
             {
                 values.map( (value, i) =>
                     <button 
-                    disabled={gameInPlay}
                     key={i}
                     className="board-width-button" 
                     style={ selectedWidth === value? selectedStyle : null} 
                     onClick={()=>(setSelectedWidth(value))}>{value}</button>
                     )
             }
-
         </div>
     )
         
