@@ -22,7 +22,7 @@ class App extends Component{
     difficulty: 2, 
     preplays: [], 
     tryAgain: false, 
-    disableNewGameButton: false, 
+    disableStartButtons: false, 
     hints: [],
     stagedHint: null
   }
@@ -167,10 +167,10 @@ class App extends Component{
       plays:0,
       highlightedTile: 0, 
       preplays, 
-      disableNewGameButton: false,
+      disableStartButtons: false,
       hints: [...preplays], 
-      stagedHint: null
-
+      stagedHint: null, 
+      tryAgain: false
     });
   }
 
@@ -185,7 +185,7 @@ class App extends Component{
   //used for New Game,  Try Again and automatically restarting after win
   //boardArea and boardWidth are used for navigation purposes only
   //buildBoard function makes an array of false(lights out) values, based on selectedWidth
-  //disableNewGameButton state prevents user from generating more than one game, which causes a glitch
+  //disableStartButtons state prevents user from generating more than one game, which causes a glitch
   //The setTimeouts are to prevent the actions from being carried out before the state is set, as they both rely on the previous values being set
   startGame=()=>{  
     this.removeKeyBoardFunctionality();
@@ -196,7 +196,7 @@ class App extends Component{
       highlightedTile: null,
       boardWidth: this.state.selectedWidth,
       tiles:  this.buildBoard(),
-      disableNewGameButton: true, 
+      disableStartButtons: true, 
       hintIndex: 0, 
       boardArea: this.state.selectedWidth * this.state.selectedWidth
     })
@@ -214,12 +214,11 @@ class App extends Component{
     this.startGame();
   }
   
-  handleClicktryagain=()=>{
+  handleClicktryAgain=()=>{
     this.tryAgainButtonRef.blur();
     this.bottomElementRef.scrollIntoView({ behavior : "smooth"})
 
-    this.setState({tryAgain: true})
-    this.startGame();
+    this.setState({tryAgain: true, selectedWidth: this.state.boardWidth}, this.startGame)
   }
 
 
@@ -233,7 +232,7 @@ class App extends Component{
         e.preventDefault();
         //right
         if(e.keyCode === 39){
-          if((this.state.highlightedTile + 1) % this.state.boardWidthç === 0){
+          if((this.state.highlightedTile + 1) % this.state.boardWidth === 0){
             next = this.state.highlightedTile;
           }
           else{
@@ -316,26 +315,28 @@ class App extends Component{
             <p>Select a tile with either a mouseclick or the <span className="pink">[spacebar]</span></p>
             <p>Stuck?  Type <span className='pink'>H</span> or click <span className='pink'>HINT</span> for a suggestion</p>
             <p>Turn off all the lights with as few moves as possible! </p>
+
           </div> 
         <div className=" all-buttons-container">
+      
           <Controls
             selectedWidth={this.state.selectedWidth}
             setSelectedWidth={this.setSelectedWidth}
           ></Controls>
           <button 
-              disabled={this.state.disableNewGameButton}
+              disabled={this.state.disableStartButtons}
               ref={ e =>this.startButtonRef = e}
               className="start-button"
               onClick={this.handleClickNewGame}>NEW GAME
           </button>
           <button 
-              disabled={!this.state.gameInPlay}
+              disabled={!this.state.gameInPlay || this.state.disableStartButtons }
               ref={ e =>this.tryAgainButtonRef = e}
               className="start-button"
-              onClick={this.handleClicktryagain}>TRY AGAIN
+              onClick={this.handleClicktryAgain}>TRY AGAIN
           </button>
           <button 
-              disabled={!this.state.gameInPlay}
+              disabled={!this.state.gameInPlay || this.state.disableStartButtons}
               ref={ e =>this.hintButtonRef = e}
               className="start-button"
               onClick={this.handleClickHint}>HINT MODE
